@@ -14,10 +14,36 @@ root.resizable(FALSE,FALSE)#Length width both blocked
 
 def connectdb():
     def submitdb():
+        global con,mycursor
         host=hostval.get()
         user=userval.get()
         password=passwordval.get()
-        # print(host,user,password)
+        try:
+            con=pymysql.connect(host=host,user=user,password=password)
+            mycursor=con.cursor()
+        except:
+            messagebox.showerror('Notification','Incorrect,Please try again..')
+            return
+
+        try:
+            strr='create database studentmanagementsystem'
+            mycursor.execute(strr)
+            strr='use studentmanagementsystem'
+            mycursor.execute(strr)
+            strr='create table studentdata(roll int, name varchar(30), mobile varchar (15), email varchar(30), address varchar(100), gender varchar(50),dob varchar(50),date varchar(50), time varchar (50))'
+            mycursor.execute(strr)
+            strr='alter table studentdata modify column roll int not null'
+            mycursor.execute(strr)
+            strr='alter table studentdata modify column roll int primary key'
+            mycursor.execute(strr)
+            messagebox.showinfo('Notification','Database Created and Connected Successfully..',parent=dbroot)
+
+        except:
+            strr= 'use studentmanagementsystem'
+            mycursor.execute(strr)
+            messagebox.showinfo('Notification', 'Database Connected Successfully..', parent=dbroot)
+        dbroot.destroy()
+
 
 
     dbroot=Toplevel()
@@ -53,9 +79,39 @@ def connectdb():
 
 def addstudent():
     def submitadd():
-        print("added")
-
-
+        roll=idval.get()
+        name=nameval.get()
+        mobile=mobileval.get()
+        email=emailval.get()
+        address=addressval.get()
+        gender=genderleval.get()
+        dob=dobleval.get()
+        addedtime=time.strftime("%H:%M:%S")
+        addeddate=time.strftime("%d/%m/%Y")
+        # print(addedtime,addeddate)
+        try:
+            strr= 'insert into studentdata values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+            mycursor.execute(strr,(roll,name,mobile,email,address,gender,dob,addedtime,addeddate))
+            con.commit()
+            res=messagebox.askyesnocancel('Notification','Roll No.{},Name: {} Addedd Successfully....Do you want to clear the form?'.format(roll,name),parent=addroot)
+            if (res==True):
+                idval.set('')
+                nameval.set('')
+                mobileval.set('')
+                emailval.set('')
+                addressval.set('')
+                genderleval.set('')
+                dobleval.set('')
+        except:
+            messagebox.showerror('Notification','Roll No. already exist,Try another Entry',parent=addroot)
+        strr='select * from studentdata'
+        mycursor.execute(strr)
+        datas=mycursor.fetchall()
+        # print(datas)
+        studentable.delete(*studentable.get_children())
+        for i in datas:
+            vv= [i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8]]
+            studentable.insert('',END,values=vv)
     addroot=Toplevel(master=dataentryframe)
     addroot.grab_set()
     addroot.geometry('470x470+220+200')
@@ -131,7 +187,24 @@ def addstudent():
 
 def searchstudent():
     def search():
-        print("search")
+        roll = idval.get()
+        name = nameval.get()
+        mobile = mobileval.get()
+        email = emailval.get()
+        address = addressval.get()
+        gender = genderleval.get()
+        dob = dobleval.get()
+        addeddate = time.strftime("%d/%m/%Y")
+
+        if(roll != ""):
+            strr='select *from studentdata where roll=%s'
+            mycursor.execute(strr,(roll))
+            datas=mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+
 
 
     searchroot=Toplevel(master=dataentryframe)

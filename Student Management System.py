@@ -1,9 +1,10 @@
 from tkinter import *
 import  time
-from tkinter import Toplevel,messagebox
+from tkinter import Toplevel,messagebox,filedialog
 from tkinter.ttk import Treeview
 from tkinter import ttk
 import  pymysql
+import pandas
 root =Tk()# Initialize TK module for our variable root.
 root.title("Student Management System")
 root.configure(bg='burlywood1')# background color
@@ -204,6 +205,63 @@ def searchstudent():
             for i in datas:
                 vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
                 studentable.insert('', END, values=vv)
+        elif (name != ""):
+            strr = 'select *from studentdata where name=%s'
+            mycursor.execute(strr, (name))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (mobile != ""):
+            strr = 'select *from studentdata where mobile=%s'
+            mycursor.execute(strr, (mobile))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (email != ""):
+            strr = 'select *from studentdata where email=%s'
+            mycursor.execute(strr, (email))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (address != ""):
+            strr = 'select *from studentdata where address=%s'
+            mycursor.execute(strr, (address))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (gender != ""):
+            strr = 'select *from studentdata where gender=%s'
+            mycursor.execute(strr, (gender))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (dob != ""):
+            strr = 'select *from studentdata where dob=%s'
+            mycursor.execute(strr, (dob))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+        elif (addeddate != ""):
+            strr = 'select *from studentdata where addeddate=%s'
+            mycursor.execute(strr, (addeddate))
+            datas = mycursor.fetchall()
+            studentable.delete(*studentable.get_children())
+            for i in datas:
+                vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+                studentable.insert('', END, values=vv)
+
 
 
 
@@ -293,12 +351,50 @@ def searchstudent():
     searchroot.mainloop()
 
 def deletestudent():
-    pass
+    cc=studentable.focus() # jis jga click hoga is function ko pata chaly ga
+    content=studentable.item(cc)#focus ka content copy ho jae ga
+    pp= content['values'][0]
+    strr= 'delete from studentdata where roll=%s'
+    mycursor.execute(strr,(pp))
+    con.commit()
+    messagebox.showinfo('Notification','Roll No. {} deleted successfully..'.format(pp))
+    strr = 'select * from studentdata'
+    mycursor.execute(strr)
+    datas = mycursor.fetchall()
+    # print(datas)
+    studentable.delete(*studentable.get_children())
+    for i in datas:
+        vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+        studentable.insert('', END, values=vv)
+
+
 
 
 def updatestudent():
     def update():
-        print("update")
+        roll = idval.get()
+        name = nameval.get()
+        mobile = mobileval.get()
+        email = emailval.get()
+        address = addressval.get()
+        gender = genderleval.get()
+        dob = dobleval.get()
+        date = dateeval.get()
+        time = timeeval.get()
+        strr='update studentdata set name=%s,mobile=%s,email=%s,address=%s,gender=%s,dob=%s,date=%s,time=%s where roll=%s'
+        mycursor.execute(strr,(name,mobile,email,address,gender,dob,date,time,roll))
+        con.commit()
+        messagebox.showinfo('Notification', 'Roll No. {} Updated successfully..'.format(roll),parent=updateroot)
+        strr = 'select * from studentdata'
+        mycursor.execute(strr)
+        datas = mycursor.fetchall()
+        studentable.delete(*studentable.get_children())
+        for i in datas:
+            vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+            studentable.insert('', END, values=vv)
+
+
+
 
     updateroot = Toplevel(master=dataentryframe)
     updateroot.grab_set()
@@ -389,25 +485,48 @@ def updatestudent():
 
     timeentry = Entry(updateroot, font=('roman', 15, 'bold'), bd=5, textvariable=timeeval)
     timeentry.place(x=250, y=490)
-
-
-
-
-
-
     submitbutton = Button(updateroot, text='Submit', font=('roman', 15, 'bold'), bg='mistyrose3', fg="black", bd=5,
                           width=20,
                           activebackground='white', activeforeground='black', command=update)
     submitbutton.place(x=150, y=537)
-
+    cc=studentable.focus()
+    content=studentable.item(cc)
+    pp=content['values']
+    if (len(pp) !=0):
+        idval.set(pp[0])
+        nameval.set(pp[1])
+        mobileval.set(pp[2])
+        emailval.set(pp[3])
+        addressval.set(pp[4])
+        genderleval.set(pp[5])
+        dobleval.set(pp[6])
+        dateeval.set(pp[7])
+        timeeval.set(pp[8])
     updateroot.mainloop()
 
 def showallstudent():
-    print("showall")
+    strr = 'select * from studentdata'
+    mycursor.execute(strr)
+    datas = mycursor.fetchall()
+    studentable.delete(*studentable.get_children())
+    for i in datas:
+        vv = [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8]]
+        studentable.insert('', END, values=vv)
 
 def exportstudent():
-    print("export")
-
+    ff=filedialog.asksaveasfilename()
+    gg=studentable.get_children()
+    roll,name,mobile,email,address,gender,dob,addeddate,addedtime=[],[],[],[],[],[],[],[],[]
+    for i in gg:
+        content=studentable.item(i)
+        pp=content['values']
+        roll.append(pp[0]),name.append(pp[1]),mobile.append(pp[2]),email.append(pp[3]),address.append(pp[4]),gender.append(pp[5]),
+        dob.append(pp[6]),addeddate.append(pp[7]),addedtime.append(pp[8])
+    dd=['Roll','Name','Mobile','Email','Address','Gender','D.O.B','Added Date','Added Time']
+    df=pandas.DataFrame(list(zip(roll,name,mobile,email,address,gender,dob,addeddate,addedtime)),columns=dd)
+    paths=r'{}.csv'.format(ff)
+    df.to_csv(paths,index=False)
+    messagebox.showinfo('Notification','Students Data is Saved {}'.format(paths))
 def exitstudent():
     res=messagebox.askyesnocancel('Notification','Do you want to exit?')
     if (res==True):
